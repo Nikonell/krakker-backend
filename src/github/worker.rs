@@ -62,11 +62,14 @@ impl GitHubWorker {
         }
         Ok(())
     }
-
     async fn process_projects(&self) -> Result<()> {
         let projects = get_all_projects().await.map_err(|e| anyhow::anyhow!("Failed to get projects: {}", e))?;
 
         for project in &projects {
+            if project.repository_id.is_none() {
+                continue;
+            }
+
             let (owner, repo) = self.parse_repository(project)?;
             let issues = self.fetch_issues(&owner, &repo).await?;
 
@@ -109,9 +112,9 @@ impl GitHubWorker {
         update_task(project.owner.id, task.id, &updated).await.map_err(|e| anyhow::anyhow!("Failed to update task: {}", e))?;
         Ok(())
     }
-
     fn parse_repository(&self, project: &SelectProject) -> Result<(String, String)> {
-        let repo = project.repository_id.as_ref().map(String::as_str).unwrap_or_default();
+        let repo = project.repository_id.as_ref()
+            .ok_or_else(|| anyhow::anyhow!("Project has no repository_id"))?;
         let (owner, repo) = repo.split_once('/').context("Invalid repository format")?;
         if owner.is_empty() || repo.is_empty() {
             anyhow::bail!("Invalid repository: owner or repo is empty");
