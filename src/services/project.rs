@@ -48,6 +48,9 @@ pub async fn get_all_projects() -> Result<Vec<SelectProject>, String> {
     let client = create_prisma_client().await?;
     let projects = client.project()
         .find_many(vec![])
+        .with(project::owner::fetch())
+        .with(project::tasks::fetch(vec![]).with(task::attached_to::fetch(vec![])))
+        .with(project::members::fetch(vec![]))
         .exec().await;
     match projects {
         Ok(projects) => {

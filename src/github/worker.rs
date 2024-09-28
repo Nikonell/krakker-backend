@@ -1,4 +1,4 @@
-use anyhow::{Context, Error, Result};
+use anyhow::{Context, Result};
 use jsonwebtoken::EncodingKey;
 use octocrab::{
     models::{issues::Issue, IssueState},
