@@ -21,7 +21,7 @@ RUN cargo build --release
 
 # Stage 4: Create the final image
 FROM debian:bookworm
-RUN apt-get update && apt-get install -y libssl3 openssl && rm -rf /var/lib/apt/lists/*
+RUN apt-get update && apt-get install -y libssl3 openssl ca-certificates && rm -rf /var/lib/apt/lists/*
 WORKDIR /usr/src/krakker-backend
 COPY --from=builder /usr/src/krakker-backend/target/release/krakker-backend .
 ENV LD_LIBRARY_PATH=/usr/lib:/usr/local/lib
