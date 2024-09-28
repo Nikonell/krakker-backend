@@ -90,6 +90,7 @@ pub async fn require_project_participant(user_id: u64, project_id: u64) -> Resul
     }
     Ok(())
 }
+
 pub async fn check_member_from_task(user_id: u64, task_id: u64) -> Result<(), String> {
     let client = create_prisma_client().await?;
     let project_id = match client

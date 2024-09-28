@@ -240,8 +240,11 @@ pub async fn delete_project(owner_id: u64, project_id: u64) -> Result<(), String
     match project {
         Ok(Some(project)) => {
             if project.owner.id != owner_id {
-                log::error!(target: LOG_TAG, "User {owner_id} is not the owner of the project {project_id}");
-                return Err("User is not the owner of the project".to_string());
+                // remove member if not owner
+                match remove_project_member(owner_id, project_id, owner_id).await {
+                    Ok(_) => return Ok(()),
+                    Err(err) => Err(err),
+                }
             } else {
                 let query_result = client
                     .project()
@@ -273,6 +276,10 @@ pub async fn add_project_member(
     project_id: u64,
     user_id: u64,
 ) -> Result<Vec<SelectUser>, String> {
+    if owner_id == user_id {
+        log::error!(target: LOG_TAG, "User {owner_id} is the owner of the project {project_id}");
+        return Err("User is the owner of the project".to_string());
+    }
     let client = create_prisma_client().await?;
 
     let project = get_project_by_id(owner_id, project_id).await;
