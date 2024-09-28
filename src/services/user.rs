@@ -2,7 +2,6 @@ use prisma_client_rust::or;
 
 use crate::models::{auth::RegisterRequest, user::SelectUser};
 use crate::models::user::SelectUserQuery;
-use crate::prisma;
 use crate::prisma::{project, QueryMode, user};
 use crate::services::common::create_prisma_client;
 

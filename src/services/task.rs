@@ -232,6 +232,7 @@ pub async fn update_task(
         .task()
         .update(task::id::equals(task_id as i32), update_properties)
         .with(task::attached_to::fetch(vec![]))
+        .with(task::project::fetch().with(project::owner::fetch()))
         .exec()
         .await;
     match task {
@@ -271,6 +272,7 @@ pub async fn add_assigned_user(
             )])],
         )
         .with(task::attached_to::fetch(vec![]))
+        .with(task::project::fetch().with(project::owner::fetch()))
         .exec()
         .await;
     task_entity_to_response(task).await
@@ -293,6 +295,7 @@ pub async fn remove_assigned_user(
             )])],
         )
         .with(task::attached_to::fetch(vec![]))
+        .with(task::project::fetch().with(project::owner::fetch()))
         .exec()
         .await;
     task_entity_to_response(task).await
