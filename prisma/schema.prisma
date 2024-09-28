@@ -1,0 +1,60 @@
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+generator client {
+  // Corresponds to the cargo alias created earlier
+  provider = "cargo prisma"
+  // The location to generate the client. Is relative to the position of the schema
+  output   = "../src/prisma.rs"
+}
+
+model User {
+  id            Int            @id @default(autoincrement())
+  email         String         @unique
+  username      String         @unique
+  createdAt     DateTime       @default(now())
+  last_seen     DateTime       @updatedAt
+  password_hash String
+  first_name    String
+  last_name     String
+  projects      Project[]      @relation(name: "ProjectOwner")
+  team_projects Project[]      @relation(name: "ProjectMembers")
+  assigned_to   Task[]         @relation(name: "AssignedTask")
+  notification  Notification[] @relation(name: "Notification")
+}
+
+model Project {
+  id          Int      @id @default(autoincrement())
+  name        String
+  description String
+  createdAt   DateTime @default(now())
+  owner       User     @relation(name: "ProjectOwner", fields: [ownerId], references: [id], onDelete: Cascade, onUpdate: Cascade)
+  ownerId     Int
+  members     User[]   @relation(name: "ProjectMembers")
+  tasks       Task[]   @relation(name: "ProjectTasks")
+  repoId      String?
+}
+
+model Task {
+  id            Int       @id @default(autoincrement())
+  name          String
+  status        String
+  description   String
+  attached_to   User[]    @relation("AssignedTask")
+  createdAt     DateTime  @default(now())
+  due_date      DateTime?
+  project       Project   @relation(name: "ProjectTasks", fields: [projectId], references: [id], onDelete: Cascade, onUpdate: Cascade)
+  projectId     Int
+  assignedIssue Int?
+}
+
+model Notification {
+  id          Int      @id @default(autoincrement())
+  title       String
+  description String
+  createdAt   DateTime @default(now())
+  user        User     @relation(name: "Notification", fields: [userId], references: [id], onDelete: Cascade, onUpdate: Cascade)
+  userId      Int
+}

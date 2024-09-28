@@ -1,0 +1,31 @@
+[package]
+name = "krakker-backend"
+version = "0.1.0"
+edition = "2021"
+
+[dependencies]
+dotenvy = { version = "0.15.7" }
+log = "0.4.22"
+reqwest = { version = "0.12.7", default-features = false, features = ["rustls-tls"] }
+serde = { version = "1.0.210", features = ["derive"]}
+serde_json = "1.0.128"
+simple_logger = "5.0.0"
+tokio = { version = "1.40.0", features = ["macros", "time", "net", "rt-multi-thread"]}
+actix-web = "4"
+actix-files = "0.6.6"
+actix-cors = "0.7.0"
+actix-multipart = "0.7.2"
+chrono = { version = "0.4.38", features = ["std", "clock", "now", "serde"] }
+strum_macros = "0.26.4"
+schemars = { package = "apistos-schemars", version = "0.8.21" }
+apistos = { version = "0.4.1", features = ["extras", "scalar", "multipart"] }
+garde = { version = "0.20.0", features = ["derive", "serde", "email", "pattern"] }
+jsonwebtoken = "9"
+tera = "1.20"
+prisma-client-rust = { git = "https://github.com/Brendonovich/prisma-client-rust", tag = "0.6.11", default-features = false, features = ["postgresql", "migrations"]}
+prisma-client-rust-cli = { git = "https://github.com/Brendonovich/prisma-client-rust", tag = "0.6.11", default-features = false, features = ["postgresql", "migrations"]}
+bcrypt = "0.15.1"
+strum = "0.26.3"
+octocrab = "0.40.0"
+anyhow = "1.0.89"
+tokio-util = "0.7.12"
