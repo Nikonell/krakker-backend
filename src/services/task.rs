@@ -1,3 +1,4 @@
+use std::ops::Deref;
 use std::str::FromStr;
 use std::vec;
 
@@ -32,15 +33,7 @@ pub async fn task_data_to_response(task_item: &Data) -> Result<SelectTask, Strin
             None => return Err("Failed to fetch attached users".to_string()),
         }
             .into_iter()
-            .map(|user| SelectUser {
-                id: user.id as u64,
-                created_at: user.created_at.timestamp() as u64,
-                last_seen: user.last_seen.timestamp() as u64,
-                email: user.email.clone(),
-                username: user.username.clone(),
-                first_name: user.first_name.clone(),
-                last_name: user.last_name,
-            })
+            .map(|user| user_data_to_response(&user))
             .collect(),
         assigned_issue: task_item.assigned_issue.map(|issue| issue as u64),
         project: match task_item.clone().project {
@@ -50,15 +43,7 @@ pub async fn task_data_to_response(task_item: &Data) -> Result<SelectTask, Strin
                 name: project.name.clone(),
                 description: project.description.clone(),
                 owner: match project.owner {
-                    Some(owner) => SelectUser {
-                        id: owner.id as u64,
-                        created_at: owner.created_at.timestamp() as u64,
-                        last_seen: owner.last_seen.timestamp() as u64,
-                        email: owner.email.clone(),
-                        username: owner.username.clone(),
-                        first_name: owner.first_name.clone(),
-                        last_name: owner.last_name,
-                    },
+                    Some(owner) => user_data_to_response(owner.deref()),
                     None => return Err("Failed to fetch project owner".to_string()),
                 },
                 members: vec![],
