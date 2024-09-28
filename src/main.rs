@@ -87,7 +87,7 @@ async fn main() -> std::io::Result<()> {
 
     let srv = server.handle();
 
-    tokio::spawn(async move {
+    actix_web::rt::spawn(async move {
         shutdown_token.cancelled().await;
         srv.stop(true).await;
     });
