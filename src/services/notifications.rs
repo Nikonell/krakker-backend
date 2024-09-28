@@ -93,7 +93,7 @@ pub async fn send_email_notification(
     match user {
         Ok(Some(found_user)) => {
             mailer
-                .send_email(&found_user.email, &title, &description)
+                .send_email_message(&found_user.email, &title, &title, &description)
                 .await?;
             Ok(found_user.email)
         }

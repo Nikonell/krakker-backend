@@ -58,7 +58,7 @@ async fn main() -> std::io::Result<()> {
         &config.github_app_private_key,
         shutdown_token.clone(),
         Duration::from_secs(60)
-    ).await.unwrap();
+    ).await;
 
     actix_web::rt::spawn(async move {
         if let Err(e) = gh_worker.work().await {
