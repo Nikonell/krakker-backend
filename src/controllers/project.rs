@@ -65,7 +65,7 @@ pub async fn create_project(
         .map_err(|e| ErrorResponse::InternalServerError(e.to_string()))?;
 
     create_notification(
-        "Кто-то вошел в аккаунт".to_string(),
+        "Новый проект".to_string(),
         format!("Уважаемый пользователь, вы только что создали новый проект {} на сервисе Krakker.", project.name).to_string(),
         project.owner.id,
         &app_data.mailer
