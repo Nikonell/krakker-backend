@@ -8,6 +8,7 @@ use crate::models::{
     task::{CreateTaskRequest, SelectTask, SelectTaskRequest, UpdateTaskRequest},
     user::SelectUser,
 };
+use crate::models::project::SelectProject;
 use crate::models::task::TaskStatus;
 use crate::prisma::{project, task, user};
 use crate::prisma::task::Data;
@@ -42,6 +43,30 @@ pub async fn task_data_to_response(task_item: &Data) -> Result<SelectTask, Strin
             })
             .collect(),
         assigned_issue: task_item.assigned_issue.map(|issue| issue as u64),
+        project: match task_item.clone().project {
+            Some(project) => SelectProject {
+                id: project.id as u64,
+                created_at: project.created_at.timestamp() as u64,
+                name: project.name.clone(),
+                description: project.description.clone(),
+                owner: match project.owner {
+                    Some(owner) => SelectUser {
+                        id: owner.id as u64,
+                        created_at: owner.created_at.timestamp() as u64,
+                        last_seen: owner.last_seen.timestamp() as u64,
+                        email: owner.email.clone(),
+                        username: owner.username.clone(),
+                        first_name: owner.first_name.clone(),
+                        last_name: owner.last_name,
+                    },
+                    None => return Err("Failed to fetch project owner".to_string()),
+                },
+                members: vec![],
+                tasks: vec![],
+                repository_id: project.repo_id.clone(),
+            },
+            None => return Err("Failed to fetch project".to_string()),
+        },
     })
 }
 
@@ -112,6 +137,7 @@ pub async fn get_user_tasks(
         .find_many(query_filters)
         .with(task::attached_to::fetch(vec![]))
         .order_by(task::due_date::order(Direction::Asc))
+        .with(task::project::fetch().with(project::owner::fetch()))
         .exec()
         .await;
 
@@ -133,6 +159,7 @@ pub async fn get_task_by_id(task_id: u64) -> Result<Option<SelectTask>, String> 
         .task()
         .find_first(vec![task::id::equals(task_id as i32)])
         .with(task::attached_to::fetch(vec![]))
+        .with(task::project::fetch().with(project::owner::fetch()))
         .exec()
         .await;
     task_result_to_response(task).await
@@ -158,6 +185,8 @@ pub async fn create_task(user_id: u64, task: &CreateTaskRequest) -> Result<Selec
                  task::assigned_issue::set(task.assigned_issue.map(|issue| issue as i32)),
             ],
         )
+        .with(task::attached_to::fetch(vec![]))
+        .with(task::project::fetch().with(project::owner::fetch()))
         .exec()
         .await;
 

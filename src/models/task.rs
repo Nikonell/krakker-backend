@@ -3,6 +3,7 @@ use garde::Validate;
 use schemars::JsonSchema;
 use serde::{Deserialize, Serialize};
 use strum_macros::EnumString;
+use crate::models::project::SelectProject;
 use super::user::SelectUser;
 
 #[derive(Debug, Serialize, Deserialize, Clone, strum_macros::Display, JsonSchema, ApiComponent, EnumString, PartialEq)]
@@ -25,7 +26,8 @@ pub struct SelectTask {
     pub attached_to: Vec<SelectUser>,
     pub status: TaskStatus,
     pub due_date: Option<u64>,
-    pub assigned_issue: Option<u64>
+    pub assigned_issue: Option<u64>,
+    pub project: SelectProject
 }
 
 #[derive(Debug, Serialize, Deserialize, JsonSchema, ApiComponent)]
